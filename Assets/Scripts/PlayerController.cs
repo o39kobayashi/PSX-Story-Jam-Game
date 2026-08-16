@@ -36,7 +36,9 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField]
     private GameObject cameraPos;
-    // private Camera camera;
+
+    [SerializeField]
+    private Transform rotationalCameraTransform;
 
 
     private void Awake() {
@@ -62,6 +64,7 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
 
+        handleMovement();
         handleRotation();
         handleGravity();
 
@@ -81,6 +84,10 @@ public class PlayerController : MonoBehaviour
 
         playerMovementInput = context.ReadValue<Vector2>();
 
+    }
+
+    private void handleMovement() {
+
         Vector3 cameraForward = cameraPos.transform.forward;
         Vector3 cameraRight = cameraPos.transform.right;
 
@@ -90,14 +97,14 @@ public class PlayerController : MonoBehaviour
         cameraForward.Normalize();
         cameraRight.Normalize();
 
-        Vector3 normalizedDirection = (cameraForward * playerMovementInput.y) + (cameraRight * playerMovementInput.x);
+        Vector3 moveDirection = (cameraForward * playerMovementInput.y) + (cameraRight * playerMovementInput.x);
 
 
-        playerMovement.x = normalizedDirection.x * walkMultiplier;
-        playerMovement.z = normalizedDirection.z * walkMultiplier;
+        playerMovement.x = moveDirection.x * walkMultiplier;
+        playerMovement.z = moveDirection.z * walkMultiplier;
 
-        runMovement.x = normalizedDirection.x * runMultiplier;
-        runMovement.z = normalizedDirection.z * runMultiplier;
+        runMovement.x = moveDirection.x * runMultiplier;
+        runMovement.z = moveDirection.z * runMultiplier;
 
 
         if (playerMovementInput.x != 0 || playerMovementInput.y != 0)
@@ -123,18 +130,25 @@ public class PlayerController : MonoBehaviour
 
     private void handleRotation() {
 
-        Vector3 targetPosition;
+        Vector3 cameraForward = cameraPos.transform.forward;
+        Vector3 cameraRight = cameraPos.transform.right;
 
-        targetPosition.x = playerMovement.x;
-        targetPosition.y = 0.0f;
-        targetPosition.z = playerMovement.z;
+        cameraForward.y = 0.0f;
+        cameraRight.y = 0.0f;
+
+        cameraForward.Normalize();
+        cameraRight.Normalize();
+
+        Vector3 targetDirection = (cameraForward * playerMovementInput.y) + (cameraRight * playerMovementInput.x);
+
+        targetDirection.y = 0.0f;
 
         Quaternion currentRotation = transform.rotation;
 
         if (isMovementPressed) {
 
-            Quaternion targetRotation = Quaternion.LookRotation(targetPosition);
-            transform.rotation = Quaternion.Slerp(currentRotation, targetRotation, rotationFactor);
+            Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
+            transform.rotation = Quaternion.Slerp(currentRotation, targetRotation, rotationFactor * Time.deltaTime);
 
         }
     

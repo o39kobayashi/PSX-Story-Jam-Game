@@ -430,7 +430,7 @@ Transform:
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -5}
+  m_LocalPosition: {x: 0, y: 0, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -976,6 +976,7 @@ MonoBehaviour:
   runMultiplier: 8
   rotationFactor: 1
   cameraPos: {fileID: 1784006163}
+  rotationalCameraTransform: {fileID: 679802187}
 --- !u!136 &1352633892
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -1229,6 +1230,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraController
   playerController: {fileID: 1352633891}
+  cameraTransform: {fileID: 330585546}
+  cameraCollisionRadius: 0.2
+  collisionLayers:
+    serializedVersion: 2
+    m_Bits: 9
+  cameraCollisionOffset: 0.2
+  minimumCollisionOffset: 0.2
   targetTransform: {fileID: 1352633895}
   cameraPivot: {fileID: 679802187}
   cameraLookSpeed: 2

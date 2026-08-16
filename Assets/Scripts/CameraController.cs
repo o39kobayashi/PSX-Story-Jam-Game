@@ -79,7 +79,7 @@ public class CameraController : MonoBehaviour
 
     private void FollowTarget() {
 
-        transform.position = Vector3.SmoothDamp(transform.position, targetTransform.position, ref cameraSmoothVelocity, cameraSpeed);
+        transform.position = Vector3.SmoothDamp(transform.position, targetTransform.position, ref cameraSmoothVelocity, cameraSpeed * Time.deltaTime);
 
     }
 
