@@ -61,6 +61,7 @@ public class PlayerController : MonoBehaviour
     {
 
         handleRotation();
+        handleGravity();
 
         if (isRunning) {
 
@@ -122,6 +123,27 @@ public class PlayerController : MonoBehaviour
             transform.rotation = Quaternion.Slerp(currentRotation, targetRotation, rotationFactor);
 
         }
+    
+    }
+
+    void handleGravity() {
+
+        if (characterController.isGrounded)
+        {
+
+            float groundedGravity = -0.05f;
+            playerMovement.y = groundedGravity;
+            runMovement.y = groundedGravity;
+
+        }
+        else {
+
+            float gravity = -9.8f;
+            playerMovement.y += gravity;
+            runMovement.y += gravity;
+        
+        }
+    
     
     }
 
