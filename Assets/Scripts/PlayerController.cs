@@ -24,35 +24,17 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private float playerWalkSpeed;
 
+    [SerializeField]
+    private float rotationFactor = 1.0f;
+
 
     void Awake() {
 
         playerMoveAction = inputActions.FindAction(PLAYER_MOVEMENT);
 
-        // playerMoveAction.started += context => { Debug.Log("started");  };
-
-
-        // lambda function => stores player input and assigns it to movement vector
-        playerMoveAction.started += context => {
-
-            playerMovementInput = context.ReadValue<Vector2>();
-            
-            playerMovement.x = playerMovementInput.x;
-            
-            playerMovement.z = playerMovementInput.y;
-
-            Debug.Log("movement vector: " + playerMovement);
-
-            if (playerMovementInput.x != 0 || playerMovementInput.y != 0) {
-                
-                isMovementPressed = true;
-
-            } else {
-
-                isMovementPressed = false;
-
-            }
-        };
+        playerMoveAction.started += onMovementInput;
+        playerMoveAction.performed += onMovementInput;
+        playerMoveAction.canceled += onMovementInput;
 
     }
 
@@ -66,26 +48,56 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
 
+        handleRotation();
+
         characterController.Move(playerMovement * Time.deltaTime);
 
     }
 
+    void onMovementInput(InputAction.CallbackContext context) {
+
+        playerMovementInput = context.ReadValue<Vector2>();
+
+        playerMovement.x = playerMovementInput.x;
+
+        playerMovement.z = playerMovementInput.y;
+
+        if (playerMovementInput.x != 0 || playerMovementInput.y != 0)
+        {
+
+            isMovementPressed = true;
+
+        }
+        else
+        {
+
+            isMovementPressed = false;
+
+        }
+
+    }
+
+    void handleRotation() {
+
+        Vector3 targetPosition;
+
+        targetPosition.x = playerMovement.x;
+        targetPosition.y = 0.0f;
+        targetPosition.z = playerMovement.z;
+
+        Quaternion currentRotation = transform.rotation;
+
+        if (isMovementPressed) {
+
+            Quaternion targetRotation = Quaternion.LookRotation(targetPosition);
+            transform.rotation = Quaternion.Slerp(currentRotation, targetRotation, rotationFactor);
+
+        }
+    
+    }
+
     void OnEnable() => inputActions.FindActionMap(PLAYER_GROUND).Enable();
 
-    /*
-    void OnEnable()
-    {
-        InputActionMap map = inputActions.FindActionMap(PLAYER_GROUND);
-
-        print("Map: " + map);
-        print("Map enabled before: " + map.enabled);
-
-        map.Enable();
-
-        print("Map enabled after: " + map.enabled);
-        print("Movement enabled after: " + inputActions.FindAction(PLAYER_MOVEMENT).enabled);
-    }
-    */
     void OnDisable() => inputActions.FindActionMap(PLAYER_GROUND).Disable();
 
     
