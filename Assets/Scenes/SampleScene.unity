@@ -604,7 +604,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   inputActions: {fileID: -944628639613478452, guid: d5079b90a3066994bb107479ceee405e, type: 3}
   characterController: {fileID: 1352633890}
-  playerWalkSpeed: 0
+  walkMultiplier: 3
+  runMultiplier: 8
   rotationFactor: 1
 --- !u!136 &1352633892
 CapsuleCollider:

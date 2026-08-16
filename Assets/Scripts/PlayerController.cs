@@ -9,23 +9,30 @@ public class PlayerController : MonoBehaviour
     private InputActionAsset inputActions;
 
     private InputAction playerMoveAction;
+    private InputAction playerRunAction;
 
     private const string PLAYER_GROUND = "Player_Ground";
     private const string PLAYER_MOVEMENT = "Movement";
+    private const string PLAYER_RUN = "Run";
     private const string PLAYER_FIRE = "Fire";
 
     private Vector2 playerMovementInput;
     private Vector3 playerMovement;
+    private Vector3 runMovement;
+    
+    
     private bool isMovementPressed;
+    private bool isRunning;
 
     [SerializeField]
     private CharacterController characterController;
 
     [SerializeField]
-    private float playerWalkSpeed;
-
+    private float walkMultiplier;
     [SerializeField]
-    private float rotationFactor = 1.0f;
+    private float runMultiplier;
+    [SerializeField]
+    private float rotationFactor;
 
 
     void Awake() {
@@ -35,6 +42,11 @@ public class PlayerController : MonoBehaviour
         playerMoveAction.started += onMovementInput;
         playerMoveAction.performed += onMovementInput;
         playerMoveAction.canceled += onMovementInput;
+
+        playerRunAction = inputActions.FindAction(PLAYER_RUN);
+
+        playerRunAction.started += onRun;
+        playerRunAction.canceled += onRun;
 
     }
 
@@ -50,7 +62,15 @@ public class PlayerController : MonoBehaviour
 
         handleRotation();
 
-        characterController.Move(playerMovement * Time.deltaTime);
+        if (isRunning) {
+
+            characterController.Move(runMovement * Time.deltaTime);
+
+        } else {
+
+            characterController.Move(playerMovement * Time.deltaTime);
+
+        }
 
     }
 
@@ -58,9 +78,12 @@ public class PlayerController : MonoBehaviour
 
         playerMovementInput = context.ReadValue<Vector2>();
 
-        playerMovement.x = playerMovementInput.x;
+        playerMovement.x = playerMovementInput.x * walkMultiplier;
+        playerMovement.z = playerMovementInput.y * walkMultiplier;
 
-        playerMovement.z = playerMovementInput.y;
+        runMovement.x = playerMovementInput.x * runMultiplier;
+        runMovement.z = playerMovementInput.y * runMultiplier;
+
 
         if (playerMovementInput.x != 0 || playerMovementInput.y != 0)
         {
@@ -75,6 +98,12 @@ public class PlayerController : MonoBehaviour
 
         }
 
+    }
+
+    void onRun(InputAction.CallbackContext context) {
+
+        isRunning = context.ReadValueAsButton();
+    
     }
 
     void handleRotation() {
