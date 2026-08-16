@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 public class CameraController : MonoBehaviour
 {
 
+
     [SerializeField]
     private PlayerController playerController;
     //private InputActionAsset inputActions;
@@ -52,20 +53,50 @@ public class CameraController : MonoBehaviour
     private float maximumPivotAngle = 35.0f;
 
 
+    private InputAction cameraAimAction;
+
+    private const string CAMERA_AIM = "Aim";
+
+    [SerializeField]
+    private float horizontalOffset;
+    [SerializeField]
+    private float depthOffset;
+    [SerializeField]
+    private float aimRotationalFactor;
+    private bool isAiming;
+
+
+
+
     void Start() {
 
         cameraInput = playerController.inputActions.FindAction(CAMERA_MOVEMENT);
 
         cameraInput.performed += onCameraInput;
 
+        cameraAimAction = playerController.inputActions.FindAction(CAMERA_AIM);
+
+        cameraAimAction.started += onAimInput;
+        cameraAimAction.canceled += onAimInput;
+
         defaultPosition = cameraTransform.localPosition.z;
     }
 
     void LateUpdate() {
 
-        FollowTarget();
+        if (isAiming) {
+
+            FollowTargetAiming();
+
+        } else {
+
+            FollowTarget();
+
+        }
+        
         RotateCamera();
         CameraCollision();
+
     }
 
     private void onCameraInput(InputAction.CallbackContext context) {
@@ -77,9 +108,25 @@ public class CameraController : MonoBehaviour
     
     }
 
+    private void onAimInput(InputAction.CallbackContext context) {
+
+        isAiming = context.ReadValueAsButton();
+    
+    }
+
     private void FollowTarget() {
 
         transform.position = Vector3.SmoothDamp(transform.position, targetTransform.position, ref cameraSmoothVelocity, cameraSpeed * Time.deltaTime);
+
+    }
+
+    private void FollowTargetAiming() {
+
+        Vector3 offsetTargetPosition = targetTransform.position;
+        offsetTargetPosition.x += horizontalOffset;
+        offsetTargetPosition.z += depthOffset;
+
+        transform.position = Vector3.SmoothDamp(transform.position, offsetTargetPosition, ref cameraSmoothVelocity, cameraSpeed * Time.deltaTime);
 
     }
 
