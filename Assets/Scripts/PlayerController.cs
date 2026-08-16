@@ -6,7 +6,7 @@ public class PlayerController : MonoBehaviour
 {
 
     [SerializeField]
-    private InputActionAsset inputActions;
+    public InputActionAsset inputActions;
 
     private InputAction playerMoveAction;
     private InputAction playerRunAction;
@@ -35,10 +35,11 @@ public class PlayerController : MonoBehaviour
     private float rotationFactor;
 
     [SerializeField]
-    private Camera camera;
+    private GameObject cameraPos;
+    // private Camera camera;
 
 
-    void Awake() {
+    private void Awake() {
 
         playerMoveAction = inputActions.FindAction(PLAYER_MOVEMENT);
 
@@ -55,8 +56,6 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-        
-
 
     }
 
@@ -78,12 +77,12 @@ public class PlayerController : MonoBehaviour
 
     }
 
-    void onMovementInput(InputAction.CallbackContext context) {
+    private void onMovementInput(InputAction.CallbackContext context) {
 
         playerMovementInput = context.ReadValue<Vector2>();
 
-        Vector3 cameraForward = camera.transform.forward;
-        Vector3 cameraRight = camera.transform.right;
+        Vector3 cameraForward = cameraPos.transform.forward;
+        Vector3 cameraRight = cameraPos.transform.right;
 
         cameraForward.y = 0.0f;
         cameraRight.y = 0.0f;
@@ -116,13 +115,13 @@ public class PlayerController : MonoBehaviour
 
     }
 
-    void onRun(InputAction.CallbackContext context) {
+    private void onRun(InputAction.CallbackContext context) {
 
         isRunning = context.ReadValueAsButton();
     
     }
 
-    void handleRotation() {
+    private void handleRotation() {
 
         Vector3 targetPosition;
 
@@ -141,7 +140,7 @@ public class PlayerController : MonoBehaviour
     
     }
 
-    void handleGravity() {
+    private void handleGravity() {
 
         if (characterController.isGrounded)
         {
