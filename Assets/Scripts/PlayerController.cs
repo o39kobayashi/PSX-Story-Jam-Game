@@ -34,6 +34,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private float rotationFactor;
 
+    [SerializeField]
+    private Camera camera;
+
 
     void Awake() {
 
@@ -79,11 +82,23 @@ public class PlayerController : MonoBehaviour
 
         playerMovementInput = context.ReadValue<Vector2>();
 
-        playerMovement.x = playerMovementInput.x * walkMultiplier;
-        playerMovement.z = playerMovementInput.y * walkMultiplier;
+        Vector3 cameraForward = camera.transform.forward;
+        Vector3 cameraRight = camera.transform.right;
 
-        runMovement.x = playerMovementInput.x * runMultiplier;
-        runMovement.z = playerMovementInput.y * runMultiplier;
+        cameraForward.y = 0.0f;
+        cameraRight.y = 0.0f;
+
+        cameraForward.Normalize();
+        cameraRight.Normalize();
+
+        Vector3 normalizedDirection = (cameraForward * playerMovementInput.y) + (cameraRight * playerMovementInput.x);
+
+
+        playerMovement.x = normalizedDirection.x * walkMultiplier;
+        playerMovement.z = normalizedDirection.z * walkMultiplier;
+
+        runMovement.x = normalizedDirection.x * runMultiplier;
+        runMovement.z = normalizedDirection.z * runMultiplier;
 
 
         if (playerMovementInput.x != 0 || playerMovementInput.y != 0)
