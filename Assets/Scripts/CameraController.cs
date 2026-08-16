@@ -11,6 +11,21 @@ public class CameraController : MonoBehaviour
     //private InputActionAsset inputActions;
     private InputAction cameraInput;
 
+    [SerializeField]
+    private Transform cameraTransform;
+    private float defaultPosition;
+    [SerializeField]
+    private float cameraCollisionRadius;
+
+    public LayerMask collisionLayers;
+
+    private Vector3 cameraVectorPosition;
+
+    [SerializeField]
+    private float cameraCollisionOffset;
+    [SerializeField]
+    private float minimumCollisionOffset;
+
     private const string CAMERA_MOVEMENT = "Camera";
 
     private Vector2 cameraMovementInput;
@@ -43,13 +58,14 @@ public class CameraController : MonoBehaviour
 
         cameraInput.performed += onCameraInput;
 
+        defaultPosition = cameraTransform.localPosition.z;
     }
 
     void LateUpdate() {
 
         FollowTarget();
         RotateCamera();
-
+        CameraCollision();
     }
 
     private void onCameraInput(InputAction.CallbackContext context) {
@@ -67,20 +83,49 @@ public class CameraController : MonoBehaviour
 
     }
 
-    private void RotateCamera() { 
-    
+    private void CameraCollision() {
+
+        float targetPosition = defaultPosition;
+        RaycastHit hit;
+        Vector3 direction = cameraTransform.position - cameraPivot.position;
+        direction.Normalize();
+
+        if (Physics.SphereCast(cameraPivot.transform.position, cameraCollisionRadius, direction, out hit, Mathf.Abs(targetPosition), collisionLayers)) {
+
+            float distance = Vector3.Distance(cameraPivot.position, hit.point);
+            targetPosition =- (distance - cameraCollisionOffset);
+
+        }
+
+        if (Mathf.Abs(targetPosition) < minimumCollisionOffset) {
+
+            targetPosition = targetPosition - minimumCollisionOffset;
+
+        }
+
+        cameraVectorPosition.z = Mathf.Lerp(cameraTransform.localPosition.z, targetPosition, 0.2f);
+
+        cameraTransform.localPosition = cameraVectorPosition;
+
+
+
+    }
+
+    private void RotateCamera() {
+
+        Vector3 rotation;
+        Quaternion targetRotation;
+
         lookAngle = lookAngle + (cameraHorizontalInput * cameraLookSpeed);
         pivotAngle = pivotAngle + (cameraVerticalInput * cameraPivotSpeed);
         pivotAngle = Mathf.Clamp(pivotAngle, minimumPivotAngle, maximumPivotAngle);
 
-        Vector3 rotation = Vector3.zero;
-
+        rotation = Vector3.zero;
         rotation.y = lookAngle;
-        Quaternion targetRotation = Quaternion.Euler(rotation);
+        targetRotation = Quaternion.Euler(rotation);
         transform.rotation = targetRotation;
 
         rotation = Vector3.zero;
-
         rotation.x = pivotAngle;
         targetRotation = Quaternion.Euler(rotation);
         cameraPivot.localRotation = targetRotation;
