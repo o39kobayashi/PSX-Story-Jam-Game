@@ -40,6 +40,26 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private Transform rotationalCameraTransform;
 
+    // aiming camera variables
+
+    private InputAction cameraAimAction;
+
+    private const string CAMERA_AIM = "Aim";
+
+    [SerializeField]
+    public float horizontalOffset;
+    [SerializeField]
+    public float depthOffset;
+    [SerializeField]
+    public float aimRotationalFactor;
+
+    [SerializeField]
+    private float aimMultiplier;
+
+    private Vector3 aimMovement;
+
+    public bool isAiming;
+
 
     private void Awake() {
 
@@ -54,6 +74,11 @@ public class PlayerController : MonoBehaviour
         playerRunAction.started += onRun;
         playerRunAction.canceled += onRun;
 
+        cameraAimAction = inputActions.FindAction(CAMERA_AIM);
+
+        cameraAimAction.started += onAim;
+        cameraAimAction.canceled += onAim;
+
     }
 
     void Start()
@@ -64,11 +89,22 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
 
+
         handleMovement();
         handleRotation();
         handleGravity();
 
-        if (isRunning) {
+        MovePlayer();
+
+    }
+
+    private void MovePlayer() {
+
+        if (isAiming) {
+
+            characterController.Move(aimMovement * Time.deltaTime);
+
+        } else if (isRunning) {
 
             characterController.Move(runMovement * Time.deltaTime);
 
@@ -78,11 +114,18 @@ public class PlayerController : MonoBehaviour
 
         }
 
+
     }
 
     private void onMovementInput(InputAction.CallbackContext context) {
 
         playerMovementInput = context.ReadValue<Vector2>();
+
+    }
+
+    private void onAim(InputAction.CallbackContext context) {
+
+        isAiming = context.ReadValueAsButton();
 
     }
 
@@ -105,6 +148,9 @@ public class PlayerController : MonoBehaviour
 
         runMovement.x = moveDirection.x * runMultiplier;
         runMovement.z = moveDirection.z * runMultiplier;
+
+        aimMovement.x = moveDirection.x * aimMultiplier;
+        aimMovement.z = moveDirection.z * aimMultiplier;
 
 
         if (playerMovementInput.x != 0 || playerMovementInput.y != 0)

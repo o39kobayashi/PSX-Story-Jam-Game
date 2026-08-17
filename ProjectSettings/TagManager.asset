@@ -11,9 +11,9 @@ TagManager:
   - Player
   - Water
   - UI
-  - 
-  - 
-  - 
+  - Enemy
+  - Breakable Objects
+  - Indestructible Objects
   - 
   - 
   - 

@@ -2,6 +2,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.InputSystem;
+using System.Runtime.CompilerServices;
 
 public class CameraController : MonoBehaviour
 {
@@ -9,7 +10,7 @@ public class CameraController : MonoBehaviour
 
     [SerializeField]
     private PlayerController playerController;
-    //private InputActionAsset inputActions;
+
     private InputAction cameraInput;
 
     [SerializeField]
@@ -52,49 +53,34 @@ public class CameraController : MonoBehaviour
     private float minimumPivotAngle = -35.0f;
     private float maximumPivotAngle = 35.0f;
 
-
-    private InputAction cameraAimAction;
-
-    private const string CAMERA_AIM = "Aim";
-
-    [SerializeField]
-    private float horizontalOffset;
-    [SerializeField]
-    private float depthOffset;
-    [SerializeField]
-    private float aimRotationalFactor;
-    private bool isAiming;
-
-
+    private float aimLookSpeed;
+    
 
 
     void Start() {
+
+        aimLookSpeed = 1.0f;
 
         cameraInput = playerController.inputActions.FindAction(CAMERA_MOVEMENT);
 
         cameraInput.performed += onCameraInput;
 
+        
+        /*
         cameraAimAction = playerController.inputActions.FindAction(CAMERA_AIM);
 
         cameraAimAction.started += onAimInput;
         cameraAimAction.canceled += onAimInput;
+        */
+        
 
         defaultPosition = cameraTransform.localPosition.z;
     }
 
     void LateUpdate() {
-
-        if (isAiming) {
-
-            FollowTargetAiming();
-
-        } else {
-
-            FollowTarget();
-
-        }
         
         RotateCamera();
+        FollowTarget();
         CameraCollision();
 
     }
@@ -104,29 +90,13 @@ public class CameraController : MonoBehaviour
         cameraMovementInput = context.ReadValue<Vector2>();
 
         cameraHorizontalInput = cameraMovementInput.x;
-        cameraVerticalInput = cameraMovementInput.y;
-    
-    }
-
-    private void onAimInput(InputAction.CallbackContext context) {
-
-        isAiming = context.ReadValueAsButton();
+        cameraVerticalInput = cameraMovementInput.y * -1;
     
     }
 
     private void FollowTarget() {
 
         transform.position = Vector3.SmoothDamp(transform.position, targetTransform.position, ref cameraSmoothVelocity, cameraSpeed * Time.deltaTime);
-
-    }
-
-    private void FollowTargetAiming() {
-
-        Vector3 offsetTargetPosition = targetTransform.position;
-        offsetTargetPosition.x += horizontalOffset;
-        offsetTargetPosition.z += depthOffset;
-
-        transform.position = Vector3.SmoothDamp(transform.position, offsetTargetPosition, ref cameraSmoothVelocity, cameraSpeed * Time.deltaTime);
 
     }
 
@@ -163,8 +133,10 @@ public class CameraController : MonoBehaviour
         Vector3 rotation;
         Quaternion targetRotation;
 
-        lookAngle = lookAngle + (cameraHorizontalInput * cameraLookSpeed);
-        pivotAngle = pivotAngle + (cameraVerticalInput * cameraPivotSpeed);
+        SetAimSensitivity();
+
+        lookAngle = lookAngle + (cameraHorizontalInput * cameraLookSpeed * aimLookSpeed);
+        pivotAngle = pivotAngle + (cameraVerticalInput * cameraPivotSpeed * aimLookSpeed);
         pivotAngle = Mathf.Clamp(pivotAngle, minimumPivotAngle, maximumPivotAngle);
 
         rotation = Vector3.zero;
@@ -178,4 +150,21 @@ public class CameraController : MonoBehaviour
         cameraPivot.localRotation = targetRotation;
     
     }
+
+    private void SetAimSensitivity() {
+
+        if (playerController.isAiming)
+        {
+
+            aimLookSpeed = 0.3f;
+
+        }
+        else {
+
+            aimLookSpeed = 1.0f;
+        
+        }
+    
+    }
+
 }
