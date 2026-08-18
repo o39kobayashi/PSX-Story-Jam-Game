@@ -30,14 +30,18 @@ public class RangedEnemy : MonoBehaviour
     private const float MAX_RANGED_DISTANCE = 25.0f;
 
     [SerializeField]
-    private float timer = 5.0f;
+    private float timer = 1.5f;
     private float attackTimer;
 
     [SerializeField]
     private GameObject aetherOrbPrefab;
+    [SerializeField]
+    private GameObject normalOrbPrefab;
 
     [SerializeField]
     private Transform aetherSpawnPoint1;
+    [SerializeField]
+    private Transform normalSpawnPoint1;
 
     private const int MAX_NUM__ORBS = 5;
     public int currentOrbs;
@@ -82,10 +86,22 @@ public class RangedEnemy : MonoBehaviour
 
             attackTimer = timer;
 
-            Debug.Log("Bullet should spawn");
-            GameObject orbInstance = Instantiate(aetherOrbPrefab);
+            float spawnChance = Random.Range(0.0f, 1.0f);
+            GameObject orbInstance;
 
-            orbInstance.GetComponent<NavMeshAgent>().Warp(aetherSpawnPoint1.position);
+            if (spawnChance <= 0.60f)
+            {
+
+                orbInstance = Instantiate(aetherOrbPrefab);
+                orbInstance.GetComponent<NavMeshAgent>().Warp(aetherSpawnPoint1.position);
+
+            }
+            else {
+
+                orbInstance = Instantiate(normalOrbPrefab);
+                orbInstance.GetComponent<NavMeshAgent>().Warp(normalSpawnPoint1.position);
+
+            }
 
             currentOrbs++;
 
