@@ -6,6 +6,8 @@ TagManager:
   tags:
   - RangedEnemy
   - MeleeEnemy
+  - AetherOrb
+  - NormalOrb
   layers:
   - Default
   - TransparentFX

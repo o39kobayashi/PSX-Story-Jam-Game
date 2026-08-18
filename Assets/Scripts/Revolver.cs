@@ -24,6 +24,12 @@ public class Revolver : MonoBehaviour
 
     private const string RANGED_ENEMY_TAG = "RangedEnemy";
     private const string MELEE_ENEMY_TAG = "MeleeEnemy";
+
+    private const string AETHER_ORB_TAG = "AetherOrb";
+    private const string NORMAL_ORB_TAG = "NormalOrb";
+
+    private const string CRIT_ESSENCE_TAG = "CriticalEssence";
+
     private const float HITSCAN_RANGE = 1000.0f;
     private const int MAX_AMMO = 6;
 
@@ -62,8 +68,7 @@ public class Revolver : MonoBehaviour
                         enemy.TakeDamage();
 
 
-                    } else if (hit.collider.CompareTag(MELEE_ENEMY_TAG))
-                    {
+                    } else if (hit.collider.CompareTag(MELEE_ENEMY_TAG)) {
 
                         Debug.Log("Hit melee enemy");
 
@@ -71,6 +76,18 @@ public class Revolver : MonoBehaviour
 
                 } else {
 
+                    if (hit.collider.CompareTag(AETHER_ORB_TAG))
+                    {
+
+                        ProjectileBehavior aetherOrb = hit.collider.GetComponent<ProjectileBehavior>();
+                        aetherOrb.GetDestroyed();
+
+
+                    } else if (hit.collider.CompareTag(CRIT_ESSENCE_TAG)) {
+
+                        Debug.Log("Critical damage!");
+
+                    }
 
                     Debug.Log("Aether Bullet Shot: aether logic");
                 
