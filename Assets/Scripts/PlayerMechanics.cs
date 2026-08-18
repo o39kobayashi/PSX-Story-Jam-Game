@@ -9,8 +9,10 @@ public class PlayerMechanics : MonoBehaviour
 
     private InputAction fireAction;
     private InputAction reloadAction;
+    private InputAction switchAction;
 
     private const string REVOLVER_FIRE = "Fire";
+    private const string REVOLVER_SWITCH = "Switch Bullet";
     private const string REVOLVER_RELOAD = "Reload";
 
     [SerializeField]
@@ -26,7 +28,11 @@ public class PlayerMechanics : MonoBehaviour
 
         reloadAction = playerController.inputActions.FindAction(REVOLVER_RELOAD);
 
-        reloadAction.performed += _ctx => revolver.Reload();
+        reloadAction.performed += ctx => revolver.Reload();
+
+        switchAction = playerController.inputActions.FindAction(REVOLVER_SWITCH);
+
+        switchAction.performed += ctx => revolver.SwitchBulletType();
 
     }
 

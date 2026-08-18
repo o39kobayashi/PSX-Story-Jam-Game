@@ -19,6 +19,8 @@ public class RangedEnemy : MonoBehaviour
 
     private float currentDistance;
 
+    private float currentHealth;
+
     [SerializeField]
     private float maxDistance;
 
@@ -31,7 +33,7 @@ public class RangedEnemy : MonoBehaviour
 
         enemy = GetComponent<NavMeshAgent>();
 
-        
+        currentHealth = MAX_HEALTH;
 
     }
 
@@ -67,4 +69,23 @@ public class RangedEnemy : MonoBehaviour
         enemy.destination = Vector3.Lerp(transform.position, player.gameObject.transform.position, 0.5f);
     }
 
+    public void TakeDamage() {
+
+        currentHealth -= 10;
+
+        Debug.Log("Took Damage! Current Health: " + currentHealth);
+
+        if (currentHealth <= 0.0f) {
+
+            Die();
+        
+        }
+    
+    }
+
+    private void Die() {
+
+        Destroy(gameObject);
+    
+    }
 }

@@ -22,9 +22,17 @@ public class Revolver : MonoBehaviour
 
     private float timeLastShot;
 
+    private const string RANGED_ENEMY_TAG = "RangedEnemy";
+    private const string MELEE_ENEMY_TAG = "MeleeEnemy";
     private const float HITSCAN_RANGE = 1000.0f;
-
     private const int MAX_AMMO = 6;
+
+    private bool isAetherBullet;
+    void Start() {
+
+        isAetherBullet = false;
+    
+    }
 
     public void Shoot() {
 
@@ -43,6 +51,30 @@ public class Revolver : MonoBehaviour
             if (Physics.Raycast(hitscanRay, out RaycastHit hit, HITSCAN_RANGE, hitscanLayers)) {
 
                 Debug.Log("HIT: " + hit.collider.gameObject.name);
+
+                if (!isAetherBullet)
+                {
+
+                    if (hit.collider.CompareTag(RANGED_ENEMY_TAG))
+                    {
+
+                        RangedEnemy enemy = hit.collider.GetComponent<RangedEnemy>();
+                        enemy.TakeDamage();
+
+
+                    } else if (hit.collider.CompareTag(MELEE_ENEMY_TAG))
+                    {
+
+                        Debug.Log("Hit melee enemy");
+
+                    }
+
+                } else {
+
+
+                    Debug.Log("Aether Bullet Shot: aether logic");
+                
+                }
             
             }
 
@@ -70,6 +102,22 @@ public class Revolver : MonoBehaviour
             Debug.Log("RELOADED");
             currentAmmo = MAX_AMMO;
 
+        }
+    
+    }
+
+    public void SwitchBulletType() {
+
+        isAetherBullet = !isAetherBullet;
+
+        if (isAetherBullet) {
+
+            Debug.Log("Aether Bullet");
+
+        } else {
+
+            Debug.Log("Rusted Bullet");
+        
         }
     
     }
