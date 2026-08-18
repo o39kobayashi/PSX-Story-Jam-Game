@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
 
 public class ProjectileBehavior : MonoBehaviour
@@ -23,6 +24,9 @@ public class ProjectileBehavior : MonoBehaviour
 
     private const float START_UP_TIME = 1.5f;
     private float timer;
+
+    private const float AETHER_ORB_DMG = 45.0f;
+    private const float NORMAL_ORB_DMG = 15.0f;
 
     private bool alreadyShot = false;
 
@@ -86,8 +90,6 @@ public class ProjectileBehavior : MonoBehaviour
 
         if (timer <= 0) {
 
-            Debug.Log("shouldve shot");
-
             lastKnownPosition = player.transform.position;
             orb.destination = lastKnownPosition;
 
@@ -100,7 +102,6 @@ public class ProjectileBehavior : MonoBehaviour
     public void GetDestroyed() {
 
         rangedEnemy.currentOrbs--;
-        Debug.Log("Aether Orb destroyed");
         Destroy(gameObject);
     
     }
@@ -110,11 +111,31 @@ public class ProjectileBehavior : MonoBehaviour
         if (!orb.hasPath) {
 
             rangedEnemy.currentOrbs--;
-            Debug.Log("Aether Orb destroyed");
             Destroy(gameObject);
 
         }
     
-    
+    }
+
+    private void OnTriggerEnter(Collider other) {
+
+        if (other.GetComponent<CharacterController>() != null) {
+
+            PlayerMechanics playerMechanics = player.GetComponent<PlayerMechanics>();
+
+            if (gameObject.CompareTag(NORMAL_ORB_TAG)) {
+                
+                playerMechanics.TakeDamage(NORMAL_ORB_DMG);
+
+            } else {
+
+                playerMechanics.TakeDamage(AETHER_ORB_DMG);
+            
+            }
+        
+        }
+
+        Destroy(gameObject);
+
     }
 }

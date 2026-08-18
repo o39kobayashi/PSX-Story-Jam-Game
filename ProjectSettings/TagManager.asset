@@ -9,6 +9,7 @@ TagManager:
   - AetherOrb
   - NormalOrb
   - CriticalEssence
+  - EssenceSpawn
   layers:
   - Default
   - TransparentFX

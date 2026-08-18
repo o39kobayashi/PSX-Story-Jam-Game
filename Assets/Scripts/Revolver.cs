@@ -1,9 +1,16 @@
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class Revolver : MonoBehaviour
 {
 
+
+    [SerializeField]
+    private GameObject player;
+
+    [SerializeField]
+    private RangedEnemy rangedEnemy;
 
     [SerializeField]
     private Camera revolverCamera;
@@ -32,6 +39,11 @@ public class Revolver : MonoBehaviour
 
     private const float HITSCAN_RANGE = 1000.0f;
     private const int MAX_AMMO = 6;
+
+    private const float NORMAL_DMG = 10.0f;
+    private const float CRIT_DMG = 50.0f;
+
+    private const float ESSENCE_TAKEN = 25.0f;
 
     private bool isAetherBullet;
     void Start() {
@@ -64,8 +76,8 @@ public class Revolver : MonoBehaviour
                     if (hit.collider.CompareTag(RANGED_ENEMY_TAG))
                     {
 
-                        RangedEnemy enemy = hit.collider.GetComponent<RangedEnemy>();
-                        enemy.TakeDamage();
+                        // RangedEnemy enemy = hit.collider.GetComponent<RangedEnemy>();
+                        rangedEnemy.TakeDamage(NORMAL_DMG);
 
 
                     } else if (hit.collider.CompareTag(MELEE_ENEMY_TAG)) {
@@ -76,20 +88,30 @@ public class Revolver : MonoBehaviour
 
                 } else {
 
+                    PlayerMechanics playerMechanics = player.GetComponent<PlayerMechanics>();
+
                     if (hit.collider.CompareTag(AETHER_ORB_TAG))
                     {
 
                         ProjectileBehavior aetherOrb = hit.collider.GetComponent<ProjectileBehavior>();
                         aetherOrb.GetDestroyed();
 
+                        playerMechanics.IncreaseAetherMeter(ESSENCE_TAKEN);
+
 
                     } else if (hit.collider.CompareTag(CRIT_ESSENCE_TAG)) {
 
-                        Debug.Log("Critical damage!");
+                        EssenceController essence = hit.collider.GetComponent<EssenceController>();
+                        essence.GetDestroyed();
+
+                        
+                        rangedEnemy.TakeDamage(CRIT_DMG);
+                        rangedEnemy.essenceAvailable = false;
+
+                        playerMechanics.SpendEssence();
 
                     }
 
-                    Debug.Log("Aether Bullet Shot: aether logic");
                 
                 }
             

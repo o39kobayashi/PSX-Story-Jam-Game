@@ -1,5 +1,7 @@
+using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Rendering;
 
 public class PlayerMechanics : MonoBehaviour
 {
@@ -17,6 +19,12 @@ public class PlayerMechanics : MonoBehaviour
 
     [SerializeField]
     private Revolver revolver;
+
+    private const float MAX_HEALTH = 150.0f;
+    public float currentHealth;
+
+    private const float MAX_AETHER_METER = 100.0f;
+    public float currentAetherMeter = 0.0f;
 
 
     private void Awake()
@@ -36,9 +44,51 @@ public class PlayerMechanics : MonoBehaviour
 
     }
 
+    void Start() {
+
+
+        currentHealth = MAX_HEALTH;
+    
+    
+    }
+
     void Update()
     {
 
     }
+
+    public void IncreaseAetherMeter(float essenceTaken) {
+
+        if (currentAetherMeter < MAX_AETHER_METER) {
+
+            currentAetherMeter += essenceTaken;
+
+        }
+    
+    }
+
+    public void TakeDamage(float damageTaken) {
+
+        currentHealth -= damageTaken;
+
+        if (currentHealth <= 0) {
+
+            Die();
+        }
+    
+    }
+
+    public void SpendEssence() {
+
+        currentAetherMeter = 0.0f;
+    
+    }
+
+    void Die() {
+
+        Debug.Log("YOU ARE DEAD");
+    
+    }
+
 
 }

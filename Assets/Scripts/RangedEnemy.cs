@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
 
 public class RangedEnemy : MonoBehaviour
@@ -37,17 +38,29 @@ public class RangedEnemy : MonoBehaviour
     private GameObject aetherOrbPrefab;
     [SerializeField]
     private GameObject normalOrbPrefab;
+    [SerializeField]
+    private GameObject essencePrefab;
 
     [SerializeField]
     private Transform aetherSpawnPoint1;
     [SerializeField]
     private Transform normalSpawnPoint1;
+    [SerializeField]
+    private Transform essenceSpawnPoint;
 
     private const int MAX_NUM__ORBS = 5;
     public int currentOrbs;
 
+    private PlayerMechanics playerMechanics;
+
+    private const float MAX_AETHER_METER = 100.0f;
+
+    public bool essenceAvailable = false;
+
     void Start()
     {
+
+        playerMechanics = player.GetComponent<PlayerMechanics>();
 
         enemy = GetComponent<NavMeshAgent>();
 
@@ -61,6 +74,14 @@ public class RangedEnemy : MonoBehaviour
 
     void Update()
     {
+
+        if (!essenceAvailable && playerMechanics.currentAetherMeter == MAX_AETHER_METER) {
+
+            GameObject essenceInstance = Instantiate(essencePrefab, essenceSpawnPoint.position, essenceSpawnPoint.rotation);
+
+            essenceAvailable = true;
+        
+        }
 
         if (!InRange())
         {
@@ -132,9 +153,9 @@ public class RangedEnemy : MonoBehaviour
         enemy.destination = Vector3.Lerp(transform.position, player.transform.position, 0.5f);
     }
 
-    public void TakeDamage() {
+    public void TakeDamage(float damageTaken) {
 
-        currentHealth -= 10;
+        currentHealth -= damageTaken;
 
         Debug.Log("Took Damage! Current Health: " + currentHealth);
 
