@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
@@ -61,6 +62,14 @@ public class PlayerController : MonoBehaviour
     public bool isAiming;
 
 
+    private Animator animator;
+
+    private const string IS_WALKING = "isWalking";
+    private const string IS_RUNNING = "isRunning";
+
+    int isWalkingHash;
+    int isRunningHash;
+
     private void Awake() {
 
         playerMoveAction = inputActions.FindAction(PLAYER_MOVEMENT);
@@ -84,6 +93,12 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
 
+        animator = GetComponent<Animator>();
+
+        isWalkingHash = Animator.StringToHash("isWalking");
+
+        isRunningHash = Animator.StringToHash("isRunning");
+
     }
 
     void Update()
@@ -99,6 +114,8 @@ public class PlayerController : MonoBehaviour
     }
 
     private void MovePlayer() {
+
+        HandleAnimation();
 
         if (isAiming) {
 
@@ -126,6 +143,41 @@ public class PlayerController : MonoBehaviour
     private void onAim(InputAction.CallbackContext context) {
 
         isAiming = context.ReadValueAsButton();
+
+    }
+
+    private void HandleAnimation() {
+
+        bool running = animator.GetBool(isRunningHash);
+        bool isWalking = animator.GetBool(isWalkingHash);
+
+        if (!isWalking && isMovementPressed)
+        {
+
+            animator.SetBool(isWalkingHash, true);
+
+        }
+
+        if (isWalking && !isMovementPressed)
+        {
+
+            animator.SetBool(isWalkingHash, false);
+
+        }
+
+        if (!running && (isMovementPressed && isRunning && !isAiming))
+        {
+
+            animator.SetBool(isRunningHash, true);
+
+        }
+
+        if (running && (!isMovementPressed || !isRunning || isAiming))
+        {
+
+            animator.SetBool(isRunningHash, false);
+
+        }
 
     }
 
